@@ -22,7 +22,7 @@ class Taply_Paybutton_Block_Button_Pay extends Mage_Core_Block_Template
         $cartItems = $quote->getAllVisibleItems();
         foreach ($cartItems as $item) { 
             $product = $item->getProduct();
-            $arrItems[] = array(
+            $arrItem = array(
                 'item_prod_id'      => $product->getId(),
                 'item_name'         => $product->getName(),
                 'item_img'          => (string)Mage::helper('catalog/image')->init($product, 'thumbnail'),
@@ -32,8 +32,9 @@ class Taply_Paybutton_Block_Button_Pay extends Mage_Core_Block_Template
             );
             $objAttr = $product->getCustomOption('attributes');
             if($objAttr){
-                $arrItems['item_prod_attr'] = unserialize($objAttr->getValue());
+                $arrItem['item_prod_attr'] = unserialize($objAttr->getValue());
             }
+            $arrItems[] = $arrItem;
         }
         
         return array('merchant' => $this->config['merchant_id'],'description' => $this->config['description'],'currency'=>'USD','items' => $arrItems);

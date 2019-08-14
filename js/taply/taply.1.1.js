@@ -75,7 +75,11 @@
             
             w.TaplyDlg.initialized = true;
         },
-
+//        mask: function(ti){
+//            if(ti.onkeydown){
+//                ti.onkeydown = w.Taply.check;
+//            }
+//        },
         send: function(){
             w.Taply.send(w.TaplyDlg.current);
         },
@@ -150,7 +154,7 @@
                     break;
                 case 1:
                     n='<div><div class="loader">Loading</div><p>' + w.Taply.notifyMessages[c] + '</p></div>';
-                    f='<div><button class="btn pay-later">Pay later</button><button class="btn btn-alt close-modal">Cancel</button></div>'
+                    f='<div>' + (w.Taply.showPayLater? '<button class="btn pay-later">Pay later</button>' : '') + '<button class="btn btn-alt close-modal">Cancel</button></div>'
                     break;
                 default :
                     n= '<div><p>' + (w.Taply.notifyMessages[c] ? w.Taply.notifyMessages[c] : n) + '</p></div>';
@@ -227,7 +231,7 @@
         }
     };
     w.Taply = {
-        apiurl: "https://njs-api.paybytaply.com/payment",
+        apiurl: "https://api.paybytaply.com/payment",
         btnClass: 'taply-block',
         modules: [],
         mask: '(___) ___-____',
@@ -308,16 +312,18 @@
             return false;
         },
         init: function(){
-            w.Taply.ls(w.Taply.apiurl + '/start?callback=Taply.initValues');
+//            w.Taply.ls(w.Taply.apiurl + '/start?callback=Taply.initValues');
+            w.Taply.initValues();
             var tbs = d.getElementsByClassName(w.Taply.btnClass);
             for(var i=0; i<tbs.length; i++){
                 w.Taply.modules.push(new w.TaplyModule(tbs[i],w.Taply.modules.length) );
             }
         },
-        initValues: function(data){
-            if(data.result.phone){
-                w.Taply.savedPhone=w.Taply.format(data.result.phone);
-                var tbs = d.getElementsByClassName(w.Taply.btnClass), phone=w.Taply.savedPhone;
+        initValues: function(){
+            var phone = w.localStorage.getItem('taply_phone');
+            if(phone){
+                w.Taply.savedPhone = phone;
+                var tbs = d.getElementsByClassName(w.Taply.btnClass);
                 for(var i=0; i<tbs.length; i++){
                     var ps = tbs[i].getElementsByTagName('input');
                     for(var p=0;p<ps.length;p++){
@@ -337,8 +343,8 @@
                 case 'item':
                     p = "&iuid=" + block.el.attributes['data-iuid'].value;
                 break;
-                case 'cart':
-                    p = "&cart=" + block.el.attributes['data-cart'].value;
+                case 'cart': 
+                    p = "&cart=" + encodeURIComponent(block.el.attributes['data-cart'].value);
                 break;
                 case 'auto':
 //                    var cart = w.Taply.getCart(block);
@@ -360,20 +366,23 @@
             clearInterval(w.Taply.ch);
             if(block.save_phone.checked){
                 w.Taply.savedPhone = block.phone.value;
+                w.localStorage.setItem('taply_phone',w.Taply.savedPhone);
             }
             if(w.Taply.verify(block)){
                 w.Taply.ls(w.Taply.apiurl + '/add?callback=Taply.checkResponse' + w.Taply.getParamStr(block));
             }
         },
         cancel: function(block){
+            clearInterval(w.Taply.ch);
             if(block.pid){
-                w.Taply.ls(w.Taply.apiurl + "/cancel?payment=" + block.pid);
+                w.Taply.ls(w.Taply.apiurl + "/cancel?callback=n&payment=" + block.pid);
                 block.initialized = false;
             }
         },
         payLater: function(block){
+            clearInterval(w.Taply.ch);
             if(block.pid){
-                w.Taply.ls(w.Taply.apiurl + "/paylater?payment=" + block.pid);
+                w.Taply.ls(w.Taply.apiurl + (w.Taply.showPayLater? '/paylater' : '/cancel' ) + "?callback=n&payment=" + block.pid);
                 block.initialized = false;
             }
         },
@@ -386,6 +395,7 @@
                 if(el === undefined){
                     return;
                 }
+                w.Taply.showPayLater = data.result.pay_later_button;
                 if (data.result.payment_result == 1){
                     n = w.Taply.notifies.complete;
                     w.Taply.ch = setInterval(w.Taply.checkPayment,1000,data.result.payment);
@@ -439,7 +449,7 @@
         },
     };
     var css=document.createElement("style");
-    css.innerHTML = ".pay-module .taply-apply-pay {background: url( //www.paybytaply.com/static/img/asset/pay-by-taply-btn-dark-wide.png ) no-repeat;display: block;float: right;height: 53px;margin-bottom: 10px;font-size: 0;width: 248px;}@media only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {.pay-module .taply-apply-pay { background-image: url( //www.paybytaply.com/static/img/asset/pay-by-taply-btn-dark-2x.png );background-size: 248px 62px;}}.pay-module a {color: #6a0fa5; text-decoration: none; } .pay-module a:hover {text-decoration: underline; }.pay-module p {color: #959595; font-size: 16px; clear: both;}.pay-module h4 {color: #595959; font-size: 16px; margin-bottom: 10px; }.taply-modal button {   box-shadow: none;   }";
+    css.innerHTML = ".pay-module .taply-apply-pay {background: url( //www.paybytaply.com/static/img/asset/pay-by-taply-btn-dark-wide.png ) no-repeat;display: block;float: right;height: 53px;margin-bottom: 10px;font-size: 0;width: 248px;}@media only screen and (min--moz-device-pixel-ratio: 2),only screen and (-o-min-device-pixel-ratio: 2/1),only screen and (-webkit-min-device-pixel-ratio: 2),only screen and (min-device-pixel-ratio: 2) {.pay-module .taply-apply-pay {background-image: url( //www.paybytaply.com/static/img/asset/pay-by-taply-btn-dark-wide-2x.png ); background-size: 248px 53px;}}.pay-module a {color: #6a0fa5; text-decoration: none; }.pay-module a:hover {text-decoration: underline; }.pay-module p {color: #959595; font-size: 16px; clear: both;}.pay-module h4 {color: #595959; font-size: 16px; margin-bottom: 10px; }.taply-modal button {   box-shadow: none;   }";
     d.getElementsByTagName("head")[0].appendChild(css);
     w.addEventListener('load', w.Taply.init.bind(w), false);
 })(window,document);
