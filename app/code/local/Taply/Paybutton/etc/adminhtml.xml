@@ -1,0 +1,14 @@
+<config>
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <taply>Taply_Paybutton_Adminhtml</taply>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
+    
+</config>

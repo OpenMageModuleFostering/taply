@@ -8,7 +8,8 @@ class Taply_Paybutton_SuccessController extends Mage_Core_Controller_Front_Actio
     protected function _callApiMethod($strMethod, $arrParams = array()){
 
         $arrResponse = array();                                                                                                                                                                                                              
-        $process = curl_init(self::TAPLY_API_URL . $strMethod);                                                                                                                                                                              
+        $process = curl_init(self::TAPLY_API_URL . $strMethod); 
+        
         curl_setopt($process, CURLOPT_RETURNTRANSFER, 1);                                                                                                                                                                                    
         curl_setopt($process, CURLOPT_FOLLOWLOCATION, 1);                                                                                                                                                                                    
         curl_setopt($process, CURLOPT_SSL_VERIFYHOST, false);                                                                                                                                                                                
@@ -26,22 +27,19 @@ class Taply_Paybutton_SuccessController extends Mage_Core_Controller_Front_Actio
         }                                                                                                                                                                                                                                    
         return $arrResponse;                                                                                                                                                                                                                 
     }                                                                                                                                                                                                                                        
-                                                                                                                                                                                                                                             
-                                                                                                                                                                                                                                             
+
+
     public function indexAction()                                                                                                                                                                                                            
-    {                                                                                                                                                                                                                                        
+    {   
         $_params = $this->getRequest()->getParams();                                                                                                                                                                                         
         $config = Mage::getStoreConfig('payment/taply');
-        $arrResponse = $this->_callApiMethod('get-payment-info', array('payment' => $_params['payment'], 'merchantid' => $config['merchant_id'] )); 
-        
-        if(!isset($arrResponse['result']['cart'])){
-            echo json_encode(array('error' => 'Carts not matched'));
-            exit();
-        }
+        $arrResponse = $this->_callApiMethod('get-payment-info', array('payment' => $_params['payment'], 'merchantid' => $config['merchant_id'] ));
+
         $sOrderCartJson = $arrResponse['result']['cart'];
         $sOrderTransaction =  $arrResponse['result']['transaction'];
         $arrOrderCart =  is_string($sOrderCartJson)? json_decode($sOrderCartJson, TRUE) : $sOrderCartJson;
         $arrOrderTransaction = is_string($sOrderTransaction)?  json_decode( $sOrderTransaction, TRUE) : $sOrderTransaction; 
+        
         if(isset($arrResponse['result']['order_id']) && $arrResponse['result']['order_id']){
             $order = Mage::getModel('sales/order')->load($arrResponse['result']['order_id']);
 
@@ -70,12 +68,50 @@ class Taply_Paybutton_SuccessController extends Mage_Core_Controller_Front_Actio
                     $product->addCustomOption('attributes', serialize($item['item_prod_attr']));
                     $request->setSuperAttribute($item['item_prod_attr']);
                 }
+                $links = Mage::getModel('downloadable/product_type')->getLinks( $product );
+//                if ($product->getTypeId() == 'simple') {
+//                    $product->addProduct($product , 1);
+//                    // for downloadable product
+//                } else 
+                    if ($product->getTypeId() == 'downloadable') {
+                    $params = array();
+                    $links = Mage::getModel('downloadable/product_type')->getLinks( $product );
+                    $linkId = 0;
+                    foreach ($links as $link) {
+                        $linkId = $link->getId();
+                    }
+                    $params['product'] = $item['item_prod_id'];
+                    $params['qty'] = $item['item_qty'];
+                    $params['links'] = array($linkId);
+                    $request = new Varien_Object();
+                    $request->setData($params);
+                    $product->processBuyRequest($product , $request);
+//                    $product->addProduct($product , $request);
+                }
+//                if($links){
+//                    $preparedLinks = array();
+//                    foreach ($links as $link) {
+//                            $preparedLinks[] = $link->getId();
+//                    }
+//                    if ($preparedLinks) {
+//                        
+//                file_put_contents('/tmp/taply.log', print_r($preparedLinks, true));
+//                        $product->addCustomOption('downloadable_link_ids', implode(',', $preparedLinks));
+//                    }
+//                    
+//                    
+//                    
+//                    
+//                    
+//                    $request->setLinks($links);
+//                }
                 if ($product->getId()) {
                     // Add product to card
                     $result = $quote->addProduct($product, $request);
                     if (is_string($result)) {
                         // Error of adding product to card
                         // @todo Log exception into DB and skip
+                file_put_contents('/tmp/taply.log', print_r($result, true), 8);
                         throw new Exception($result);
                     }
                 } else {
@@ -88,20 +124,14 @@ class Taply_Paybutton_SuccessController extends Mage_Core_Controller_Front_Actio
                 $objCustomer->loadByEmail($aUser['billingAddress']['email']);
                 if (!$objCustomer->getId()){
                     $objCustomer->setFirstname($aUser['billingAddress']['firstName'])
-                                ->setLastname($aUser['billingAddress']['lastName'])
-                                ->setEmail($aUser['billingAddress']['email'])
-                                ->setPassword($objCustomer->generatePassword(7));
-                    
-
+                        ->setLastname($aUser['billingAddress']['lastName'])
+                        ->setEmail($aUser['billingAddress']['email'])
+                        ->setPassword($objCustomer->generatePassword(7));
                     try{
                         $objCustomer->save();
                         $objCustomer->setConfirmation(null); //confirmation needed to register
                         $objCustomer->save(); //yes, this is also needed
                         $objCustomer->sendNewAccountEmail(); //send confirmation email to customer
-
-//                        $newResetPasswordLinkToken =  Mage::helper('customer')->generateResetPasswordLinkToken();
-//                        $objCustomer->changeResetPasswordLinkToken($newResetPasswordLinkToken);
-//                        $objCustomer->sendPasswordResetConfirmationEmail();
                     } 
                     catch (Exception $e) {
                         Zend_Debug::dump($e->getMessage());
@@ -116,7 +146,7 @@ class Taply_Paybutton_SuccessController extends Mage_Core_Controller_Front_Actio
                 'firstname' => $aUser['billingAddress']['firstName'],
                 'lastname' => $aUser['billingAddress']['lastName'],
                 'email' => $aUser['billingAddress']['email'],
-                'country_id' => $aUser['billingAddress']['country'],
+                'country_id' => $aUser['billingAddress']['country'] ? $aUser['billingAddress']['country'] : 'US',
                 'region' => $aUser['billingAddress']['state'],
                 'postcode' => $aUser['billingAddress']['zip'],
                 'street' => $aUser['billingAddress']['street1'], //array( $aUser['billingAddress']['street1'], $aUser['billingAddress']['street2'] ),
@@ -136,7 +166,6 @@ class Taply_Paybutton_SuccessController extends Mage_Core_Controller_Front_Actio
                 'telephone' => $aUser['shippingAddress']['phone'],
                 'save_in_address_book' => 0,
             );
-//var_dump($arrOrderTransaction['shipping']['identifier']);die;
             if(isset($arrOrderTransaction['shipping']['identifier']) && strpos(strtolower($arrResponse['result']['shipping']['identifier']), "free") === FALSE){
                 $shippingMethod = $arrOrderTransaction['shipping']['identifier']; 
             }else{
@@ -149,14 +178,21 @@ class Taply_Paybutton_SuccessController extends Mage_Core_Controller_Front_Actio
                 ->setPaymentMethod($this->_methodType)
                 ->setCollectShippingRates(true)
                 ->collectTotals();
-            $quote->getPayment()->importData(array('method' => $this->_methodType));
+            $objPayment = $quote->getPayment();
+            $objPayment->importData(array('method' => $this->_methodType));
+            $objPayment->setAdditionalInformation('payment_id',$_params['payment']);
             $quote->collectTotals()->save();
             $service = Mage::getModel('sales/service_quote', $quote);
             $service->submitAll();
-            $lastOrderId = $service->getOrder()->getId();
+            $objOrder = $service->getOrder();
+            if($arrResponse['result']['captured']){
+                $objPayment->getMethodInstance()->createInvoice($objOrder);
+                $objOrder->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true)->save();
+            }
+            $lastOrderId = $objOrder->getId();
+            $objOrder->sendNewOrderEmail();
 
             unset($quote);
-            unset($objCustomer);
             unset($service);
             echo json_encode( array('order_id' => $lastOrderId, 'redirect_url' => Mage::getUrl() . '/taply/success/thanks/order/' . $lastOrderId) );
 
@@ -166,12 +202,21 @@ class Taply_Paybutton_SuccessController extends Mage_Core_Controller_Front_Actio
         }
 
     }
-
+    
     public function thanksAction()
     {
-        Mage::getSingleton('checkout/cart')->truncate()->save();
+        try{
         $_params = $this->getRequest()->getParams();
-        $this->_redirect('sales/order/view/', array('order_id' => $_params['order']));
-
+        $order = Mage::getModel('sales/order')->load( $_params['order']);
+        
+        $objChecoutSession = Mage::getSingleton('checkout/session'); 
+        $objChecoutSession->setLastQuoteId($order->getQuoteId())->setLastSuccessQuoteId($order->getQuoteId())
+            ->setLastOrderId($order->getId())->setLastRealOrderId($order->getIncrementId());
+            
+        Mage::getSingleton('checkout/cart')->truncate()->save();
+        $this->_redirect('checkout/onepage/success');
+        }  catch (Exception $e){
+            echo $e->getMessage();
+        }
     }
 }

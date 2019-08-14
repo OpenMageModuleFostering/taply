@@ -36,8 +36,14 @@
             <paybutton>
                 <class>Taply_Paybutton_Block</class>
             </paybutton>
+            <adminhtml>
+                <rewrite>
+                  <sales_order_view>Taply_Paybutton_Block_Adminhtml_Sales_Order_View</sales_order_view>
+                </rewrite>
+             </adminhtml>
         </blocks>
     </global>
+
     <default>
         <payment>
             <taply>
