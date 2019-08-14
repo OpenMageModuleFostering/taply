@@ -1,9 +1,9 @@
 {
     "name": "OpenMageModuleFostering/taply",
     "type": "magento-module",
-    "license": "GNU-General-Public-License-(GPL)",
+    "license": "Open-Software-License-(OSL)",
     "homepage": "",
-    "description": "Add PayByTaply  button in cart",
+    "description": "Securely checkout using Apple Pay",
     "authors": [
     {
         "name": "taply",

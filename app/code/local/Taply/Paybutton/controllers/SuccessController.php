@@ -133,9 +133,9 @@ class Taply_Paybutton_SuccessController extends Mage_Core_Controller_Front_Actio
                 'telephone' => $aUser['shippingAddress']['phone'],
                 'save_in_address_book' => 0,
             );
-            
-            if(isset($arrResponse['result']['shipping']['identifier']) && strpos(strtolower($arrResponse['result']['shipping']['identifier']), "free") === FALSE){
-                $shippingMethod = $arrResponse['result']['shipping']['identifier'];
+//var_dump($arrOrderTransaction['shipping']['identifier']);die;
+            if(isset($arrOrderTransaction['shipping']['identifier']) && strpos(strtolower($arrResponse['result']['shipping']['identifier']), "free") === FALSE){
+                $shippingMethod = $arrOrderTransaction['shipping']['identifier']; 
             }else{
                 $shippingMethod = 'freeshipping_freeshipping';
             }
