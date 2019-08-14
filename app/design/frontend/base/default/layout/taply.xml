@@ -6,7 +6,7 @@
             </block>
         </reference>
         <reference name="head">
-            <action method="addItem"><type>js</type><name>taply/taply.1.1.js</name></action>
+            <action method="addItem"><type>js</type><name>taply/taply.1.2.js</name></action>
         </reference>
     </checkout_cart_index>
 </layout>
