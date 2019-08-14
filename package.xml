@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
     <name>taply</name>
-    <version>1.0.1</version>
-    <stability>devel</stability>
+    <version>1.0.2</version>
+    <stability>stable</stability>
     <license uri="http://opensource.org/licenses/osl-3.0.php">Open Software License (OSL)</license>
     <channel>community</channel>
     <extends/>
@@ -11,9 +11,9 @@
 taply allows you to use Apple Pay for an incredibly fast, secure, and seamless online checkout. Go anywhere online that has the taply button, enter your mobile number, then use the taply app to complete the purchase using Touch ID.</description>
     <notes>Securely checkout using Apple Pay</notes>
     <authors><author><name>taply</name><user>taply</user><email>admin@paybytaply.com</email></author></authors>
-    <date>2015-08-10</date>
-    <time>14:01:58</time>
-    <contents><target name="magelocal"><dir><dir name="Taply"><dir name="Paybutton"><dir name="Block"><dir name="Button"><file name="Pay.php" hash="96e03a2a96daeb5e217b7071bd67dd78"/></dir></dir><dir name="Helper"><file name="Data.php" hash="c8404ec959ddf4bf9fbee31fc2314d34"/></dir><dir name="Model"><file name="Payment.php" hash="4af32846253babe72e11551003a2662c"/><file name="Viewtype.php" hash="c39cf7f525e11ab1de3f10a939caf494"/></dir><dir name="controllers"><file name="GetshippingController.php" hash="692474af6dda396e61d7a09b58cf8e3a"/><file name="SuccessController.php" hash="f7fc1975164ebc6e89164b03898ebf94"/></dir><dir name="etc"><file name="config.xml" hash="f93350af38d05df42cb2ea07a708c075"/><file name="system.xml" hash="520313dbaf29da8a44325f1a2880d30a"/></dir></dir></dir></dir></target><target name="mageetc"><dir name="modules"><file name="Taply_Paybutton.xml" hash="444eaa37dfe56b3b3e738770353b2e1c"/></dir></target><target name="magedesign"><dir name="frontend"><dir name="base"><dir name="default"><dir name="layout"><file name="taply.xml" hash="bc7a785448a0e2b2754e46fa786a5b3d"/></dir><dir name="template"><dir name="taply"><file name="button.phtml" hash="b6541c278d428eea006a782e11abe2e3"/></dir></dir></dir></dir></dir></target><target name="mage"><dir name="js"><dir name="taply"><file name="taply.1.1.js" hash="ee5176b63f1ce1a1610ddf7827650c36"/></dir></dir></target></contents>
+    <date>2015-08-12</date>
+    <time>08:25:38</time>
+    <contents><target name="magelocal"><dir><dir name="Taply"><dir name="Paybutton"><dir name="Block"><dir name="Button"><file name="Pay.php" hash="96e03a2a96daeb5e217b7071bd67dd78"/></dir></dir><dir name="Helper"><file name="Data.php" hash="c8404ec959ddf4bf9fbee31fc2314d34"/></dir><dir name="Model"><file name="Payment.php" hash="4af32846253babe72e11551003a2662c"/><file name="Viewtype.php" hash="c39cf7f525e11ab1de3f10a939caf494"/></dir><dir name="controllers"><file name="GetshippingController.php" hash="692474af6dda396e61d7a09b58cf8e3a"/><file name="SuccessController.php" hash="f7fc1975164ebc6e89164b03898ebf94"/></dir><dir name="etc"><file name="config.xml" hash="088d52f5b81700cf7260b04ec72e4d27"/><file name="system.xml" hash="520313dbaf29da8a44325f1a2880d30a"/></dir></dir></dir></dir></target><target name="mageetc"><dir name="modules"><file name="Taply_Paybutton.xml" hash="d7671c3fa6a0558055229c42c4e930f1"/></dir></target><target name="magedesign"><dir name="frontend"><dir name="base"><dir name="default"><dir name="layout"><file name="taply.xml" hash="bc7a785448a0e2b2754e46fa786a5b3d"/></dir><dir name="template"><dir name="taply"><file name="button.phtml" hash="b6541c278d428eea006a782e11abe2e3"/></dir></dir></dir></dir></dir></target><target name="mage"><dir name="js"><dir name="taply"><file name="taply.1.1.js" hash="ee5176b63f1ce1a1610ddf7827650c36"/></dir></dir></target></contents>
     <compatible/>
     <dependencies><required><php><min>5.4.0</min><max>5.6.999</max></php></required></dependencies>
 </package>

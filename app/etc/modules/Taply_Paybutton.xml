@@ -4,7 +4,7 @@
     <Taply_Paybutton>
       <active>true</active>
       <codePool>local</codePool>
-      <version>0.1.0</version>
+      <version>1.0.2</version>
     </Taply_Paybutton>
   </modules>
 </config>
