@@ -1,6 +1,6 @@
 <?php
 class Taply_Paybutton_SuccessController extends Mage_Core_Controller_Front_Action{
-    const TAPLY_API_URL = "https://njs-api.paybytaply.com/payment/";
+    const TAPLY_API_URL = "https://api.paybytaply.com/payment/";
 
     
     protected $_methodType = 'taply';
@@ -90,7 +90,7 @@ class Taply_Paybutton_SuccessController extends Mage_Core_Controller_Front_Actio
                     $objCustomer->setFirstname($aUser['billingAddress']['firstName'])
                                 ->setLastname($aUser['billingAddress']['lastName'])
                                 ->setEmail($aUser['billingAddress']['email'])
-                                ->setPassword($customer->generatePassword(7));
+                                ->setPassword($objCustomer->generatePassword(7));
                     
 
                     try{
@@ -161,7 +161,7 @@ class Taply_Paybutton_SuccessController extends Mage_Core_Controller_Front_Actio
             echo json_encode( array('order_id' => $lastOrderId, 'redirect_url' => Mage::getUrl() . '/taply/success/thanks/order/' . $lastOrderId) );
 
         } catch (Exception $e){
-            $quote = $customer = $service = null;
+            $quote = $objCustomer = $service = null;
             echo json_encode( array('error' => $e->getMessage()) );
         }
 
