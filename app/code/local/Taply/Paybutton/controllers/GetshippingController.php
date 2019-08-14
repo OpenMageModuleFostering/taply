@@ -17,23 +17,44 @@ class Taply_Paybutton_GetshippingController extends Mage_Core_Controller_Front_A
         
         try{
             foreach ($items as $item){
+                
                 $product = Mage::getModel('catalog/product')->load($item['item_prod_id']);
                 $product->setPrice($item['item_price']);
-                $product->addCustomOption('attributes', serialize($item['item_prod_attr']));
                 $request = new Varien_Object();
                 $request->setQty($item['item_qty']);
-                $request->setSuperAttribute($item['item_prod_attr']);
+                if($item['item_prod_attr']){
+                    $product->addCustomOption('attributes', serialize($item['item_prod_attr']));
+                    $request->setSuperAttribute($item['item_prod_attr']);
+                }
+                $links = Mage::getModel('downloadable/product_type')->getLinks( $product );
+
+                    if ($product->getTypeId() == 'downloadable') {
+                        $params = array();
+                        $links = Mage::getModel('downloadable/product_type')->getLinks( $product );
+                        $linkId = 0;
+                        foreach ($links as $link) {
+                            $linkId = $link->getId();
+                        }
+                        $params['product'] = $item['item_prod_id'];
+                        $params['qty'] = $item['item_qty'];
+                        $params['links'] = array($linkId);
+                        $request = new Varien_Object();
+                        $request->setData($params);
+                        $product->processBuyRequest($product , $request);
+                }
+
                 if ($product->getId()) {
                     // Add product to card
                     $result = $objCart->addProduct($product, $request);
                     if (is_string($result)) {
                         // Error of adding product to card
                         // @todo Log exception into DB and skip
-                        throw new Exception("{error: '$result'}");
+                file_put_contents('/tmp/taply.log', print_r($result, true), 8);
+                        throw new Exception($result);
                     }
                 } else {
                     // Error of load product by id
-                    throw new Exception("{error: 'Cant load product'}");
+                    throw new Exception("Cant load product");
                     // @todo Log exception into DB and skip
                 }
             }
@@ -46,7 +67,6 @@ class Taply_Paybutton_GetshippingController extends Mage_Core_Controller_Front_A
                 ->setRegionId($regionId)
                 ->setRegion($region)
                 ->setCollectShippingRates(TRUE)->save();
-//            var_dump($sa->toArray());
         }  catch (Exception $e){
             die($e->getMessage());
         }
@@ -75,3 +95,4 @@ class Taply_Paybutton_GetshippingController extends Mage_Core_Controller_Front_A
     }
 
 }
+
