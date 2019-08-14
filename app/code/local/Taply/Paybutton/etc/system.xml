@@ -4,7 +4,7 @@
         <payment>
             <groups>
                 <taply translate="label">
-                    <label>Pay By Taply</label>
+                    <label>Taply</label>
                     <sort_order>770</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>

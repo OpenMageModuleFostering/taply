@@ -1,6 +1,6 @@
 <?php
 class Taply_Paybutton_SuccessController extends Mage_Core_Controller_Front_Action{
-    const TAPLY_API_URL = "https://api.paybytaply.com/payment/";
+    const TAPLY_API_URL = "https://api.taplycheckout.com/payment/";
 
     
     protected $_methodType = 'taply';

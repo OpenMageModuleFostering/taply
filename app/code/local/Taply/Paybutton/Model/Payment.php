@@ -13,7 +13,7 @@
  */
 class Taply_Paybutton_Model_Payment  extends Mage_Payment_Model_Method_Abstract
 {
-    const TAPLY_API_URL = "http://rc-api.paybytaply.com/payment/";
+    const TAPLY_API_URL = "http://api.taplycheckout.com/payment/";
     
     protected $_code        = 'taply';
     
