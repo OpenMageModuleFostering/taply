@@ -1,0 +1,16 @@
+{
+    "name": "OpenMageModuleFostering/taply",
+    "type": "magento-module",
+    "license": "GNU-General-Public-License-(GPL)",
+    "homepage": "",
+    "description": "Add PayByTaply  button in cart",
+    "authors": [
+    {
+        "name": "taply",
+        "email": "admin@paybytaply.com"
+    }
+],
+    "suggest": {
+        "magento-hackathon/magento-composer-installer": "*"
+    }
+}
