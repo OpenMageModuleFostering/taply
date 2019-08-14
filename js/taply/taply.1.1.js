@@ -227,7 +227,7 @@
         }
     };
     w.Taply = {
-        apiurl: "https://api.paybytaply.com/payment",
+        apiurl: "https://njs-api.paybytaply.com/payment",
         btnClass: 'taply-block',
         modules: [],
         mask: '(___) ___-____',

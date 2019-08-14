@@ -29,11 +29,11 @@ class Taply_Paybutton_GetshippingController extends Mage_Core_Controller_Front_A
                     if (is_string($result)) {
                         // Error of adding product to card
                         // @todo Log exception into DB and skip
-                        throw new Exception($result);
+                        throw new Exception("{error: '$result'}");
                     }
                 } else {
                     // Error of load product by id
-                    throw new Exception("Cant load product");
+                    throw new Exception("{error: 'Cant load product'}");
                     // @todo Log exception into DB and skip
                 }
             }

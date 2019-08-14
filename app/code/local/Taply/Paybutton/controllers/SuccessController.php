@@ -1,36 +1,36 @@
 <?php
 class Taply_Paybutton_SuccessController extends Mage_Core_Controller_Front_Action{
-    const TAPLY_API_URL = "https://api.paybytaply.com/payment/";
+    const TAPLY_API_URL = "https://njs-api.paybytaply.com/payment/";
 
     
     protected $_methodType = 'taply';
 
     protected function _callApiMethod($strMethod, $arrParams = array()){
 
-        $arrResponse = array();
-        $process = curl_init(self::TAPLY_API_URL . $strMethod);
-        curl_setopt($process, CURLOPT_RETURNTRANSFER, 1); 
-        curl_setopt($process, CURLOPT_FOLLOWLOCATION, 1); 
-        curl_setopt($process, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($process, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($process, CURLOPT_FOLLOWLOCATION, 1); 
-        if (!empty($arrParams)){
-            curl_setopt($process, CURLOPT_POST, 1); 
-            curl_setopt($process, CURLOPT_POSTFIELDS, http_build_query($arrParams));  
-        }
-        $strResponseJson = curl_exec( $process ); 
-        curl_close($process); 
-        if($strResponseJson){
-            $arrResponse = json_decode( $strResponseJson, TRUE );
-
-        }
-        return $arrResponse;
-    }
-
-
-    public function indexAction()
-    {
-        $_params = $this->getRequest()->getParams();
+        $arrResponse = array();                                                                                                                                                                                                              
+        $process = curl_init(self::TAPLY_API_URL . $strMethod);                                                                                                                                                                              
+        curl_setopt($process, CURLOPT_RETURNTRANSFER, 1);                                                                                                                                                                                    
+        curl_setopt($process, CURLOPT_FOLLOWLOCATION, 1);                                                                                                                                                                                    
+        curl_setopt($process, CURLOPT_SSL_VERIFYHOST, false);                                                                                                                                                                                
+        curl_setopt($process, CURLOPT_SSL_VERIFYPEER, false);                                                                                                                                                                                
+        curl_setopt($process, CURLOPT_FOLLOWLOCATION, 1);                                                                                                                                                                                    
+        if (!empty($arrParams)){                                                                                                                                                                                                             
+            curl_setopt($process, CURLOPT_POST, 1);                                                                                                                                                                                          
+            curl_setopt($process, CURLOPT_POSTFIELDS, http_build_query($arrParams));                                                                                                                                                         
+        }                                                                                                                                                                                                                                    
+        $strResponseJson = curl_exec( $process );                                                                                                                                                                                            
+        curl_close($process);                                                                                                                                                                                                                
+        if($strResponseJson){                                                                                                                                                                                                                
+            $arrResponse = json_decode( $strResponseJson, TRUE );                                                                                                                                                                            
+                                                                                                                                                                                                                                             
+        }                                                                                                                                                                                                                                    
+        return $arrResponse;                                                                                                                                                                                                                 
+    }                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                             
+                                                                                                                                                                                                                                             
+    public function indexAction()                                                                                                                                                                                                            
+    {                                                                                                                                                                                                                                        
+        $_params = $this->getRequest()->getParams();                                                                                                                                                                                         
         $config = Mage::getStoreConfig('payment/taply');
         $arrResponse = $this->_callApiMethod('get-payment-info', array('payment' => $_params['payment'], 'merchantid' => $config['merchant_id'] )); 
         
@@ -40,10 +40,11 @@ class Taply_Paybutton_SuccessController extends Mage_Core_Controller_Front_Actio
         }
         $sOrderCartJson = $arrResponse['result']['cart'];
         $sOrderTransaction =  $arrResponse['result']['transaction'];
-        $arrOrderCart =  json_decode($sOrderCartJson, TRUE);
-        $arrOrderTransaction =  json_decode( $sOrderTransaction, TRUE);
+        $arrOrderCart =  is_string($sOrderCartJson)? json_decode($sOrderCartJson, TRUE) : $sOrderCartJson;
+        $arrOrderTransaction = is_string($sOrderTransaction)?  json_decode( $sOrderTransaction, TRUE) : $sOrderTransaction; 
         if(isset($arrResponse['result']['order_id']) && $arrResponse['result']['order_id']){
             $order = Mage::getModel('sales/order')->load($arrResponse['result']['order_id']);
+
             if($order->getId()){
                 echo json_encode( array('order_id' => $order->getId(), 'redirect_url' =>  Mage::getUrl() . '/taply/success/thanks/order/' . $order->getId()) );
                 exit;
@@ -63,10 +64,12 @@ class Taply_Paybutton_SuccessController extends Mage_Core_Controller_Front_Actio
                 
                 $product = Mage::getModel('catalog/product')->load($item['item_prod_id']);
                 $product->setPrice($item['item_price']);
-                $product->addCustomOption('attributes', serialize($item['item_prod_attr']));
                 $request = new Varien_Object();
                 $request->setQty($item['item_qty']);
-                $request->setSuperAttribute($item['item_prod_attr']);
+                if($item['item_prod_attr']){
+                    $product->addCustomOption('attributes', serialize($item['item_prod_attr']));
+                    $request->setSuperAttribute($item['item_prod_attr']);
+                }
                 if ($product->getId()) {
                     // Add product to card
                     $result = $quote->addProduct($product, $request);
@@ -160,7 +163,7 @@ class Taply_Paybutton_SuccessController extends Mage_Core_Controller_Front_Actio
         } catch (Exception $e){
             $quote = $customer = $service = null;
             echo json_encode( array('error' => $e->getMessage()) );
-        }	
+        }
 
     }
 
