@@ -1,16 +1,19 @@
 {
-    "name": "OpenMageModuleFostering/taply",
+    "name": "OpenMageModuleFostering\/taply",
     "type": "magento-module",
     "license": "Open-Software-License-(OSL)",
     "homepage": "",
     "description": "Securely checkout using Apple Pay",
     "authors": [
-    {
-        "name": "taply",
-        "email": "admin@taplycheckout.com"
-    }
-],
+        {
+            "name": "taply",
+            "email": "admin@taplycheckout.com"
+        }
+    ],
     "suggest": {
-        "magento-hackathon/magento-composer-installer": "*"
-    }
+        "magento-hackathon\/magento-composer-installer": "*"
+    },
+    "keywords": [
+        "openmage-module"
+    ]
 }
