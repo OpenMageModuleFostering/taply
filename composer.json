@@ -1,7 +1,7 @@
 {
-    "name": "OpenMageModuleFostering\/taply",
+    "name": "openmage-module-fostering\/taply",
     "type": "magento-module",
-    "license": "Open-Software-License-(OSL)",
+    "license": "OSL-3.0",
     "homepage": "",
     "description": "Securely checkout using Apple Pay",
     "authors": [
